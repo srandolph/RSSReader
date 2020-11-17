@@ -1,1 +1,1113 @@
-[{"id":"93cb51e3.ea973","type":"tab","label":"web-request","disabled":false,"info":""},{"id":"54362130.4cac8","type":"tab","label":"RSS Reader","disabled":false,"info":""},{"id":"fd059313.7a178","type":"tab","label":"db-admin","disabled":false,"info":""},{"id":"212f736e.2f486c","type":"ui_base","theme":{"name":"theme-light","lightTheme":{"default":"#0094CE","baseColor":"#0088cc","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":true,"reset":false},"darkTheme":{"default":"#097479","baseColor":"#097479","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif","edited":false},"customTheme":{"name":"Untitled Theme 1","default":"#4B7930","baseColor":"#4B7930","baseFont":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"},"themeState":{"base-color":{"default":"#0094CE","value":"#0088cc","edited":true},"page-titlebar-backgroundColor":{"value":"#0088cc","edited":false},"page-backgroundColor":{"value":"#fafafa","edited":false},"page-sidebar-backgroundColor":{"value":"#ffffff","edited":false},"group-textColor":{"value":"#1ab2ff","edited":false},"group-borderColor":{"value":"#ffffff","edited":false},"group-backgroundColor":{"value":"#ffffff","edited":false},"widget-textColor":{"value":"#111111","edited":false},"widget-backgroundColor":{"value":"#0088cc","edited":false},"widget-borderColor":{"value":"#ffffff","edited":false},"base-font":{"value":"-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"}},"angularTheme":{"primary":"indigo","accents":"blue","warn":"red","background":"grey"}},"site":{"name":"Node-RED Dashboard","hideToolbar":"false","allowSwipe":"false","lockMenu":"false","allowTempTheme":"true","dateFormat":"DD/MM/YYYY","sizes":{"sx":48,"sy":48,"gx":6,"gy":6,"cx":6,"cy":6,"px":0,"py":0}}},{"id":"d0b422f7.437dd8","type":"ui_tab","name":"Home","icon":"dashboard","disabled":false,"hidden":false},{"id":"62f7b60d.c5f978","type":"ui_group","name":"Default","tab":"d0b422f7.437dd8","order":1,"disp":true,"width":"6","collapse":false},{"id":"94050917.c7e168","type":"sqlitedb","db":"memory","mode":"RWC"},{"id":"9a7bf3e9.632cb","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/feed","method":"get","upload":false,"swaggerDoc":"","x":110,"y":140,"wires":[["5d87c0d4.c035c"]]},{"id":"ff5438b2.770a98","type":"template","z":"93cb51e3.ea973","name":"","field":"payload","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"<!DOCTYPE html>\n<html>\n    <head>\n        <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/sketchy/bootstrap.min.css\" integrity=\"sha384-RxqHG2ilm4r6aFRpGmBbGTjsqwfqHOKy1ArsMhHusnRO47jcGqpIQqlQK/kmGy9R\" crossorigin=\"anonymous\">\n    </head>\n<body>\n\n\n<div class=\"container\">\n<h1>Feed</h1>\n<div class=\"row\">\n    <div class=\"col-md-6\">\n        <table class=\"table\">\n          <thead>\n            <tr>\n        \n              <th scope=\"col\">Name</th>\n              <th scope=\"col\">URL</th>\n              <th scope=\"col\"></th>\n            </tr>\n          </thead>\n          <tbody>\n            {{#payload}}\n            <tr class=\"table-primary\">\n              <td>{{name}}</td>\n              <td>{{url}}</td>\n              <td><a href=\"/monitor/feed/delete/{{rowid}}\" class=\"btn btn-outline-danger\">Delete</a></td>\n            </tr> \n            {{/payload}}\n          </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-6\">\n        <form method=\"post\" action=\"/monitor/feed\">\n            <label for=\"name\">Name</label>\n            <input class=\"form-control\" id=\"name\" name=\"name\">\n            <label for=\"url\">URL</label>\n            <input class=\"form-control\" id=\"url\" name=\"url\">  \n            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n        </form>\n    </div>\n</div>\n\n\n\n\n</div>\n</body>\n</html>","output":"str","x":560,"y":140,"wires":[["982e6651.11b818"]]},{"id":"982e6651.11b818","type":"http response","z":"93cb51e3.ea973","name":"","statusCode":"","headers":{},"x":690,"y":140,"wires":[]},{"id":"52d11d7d.bf0d34","type":"feedparse","z":"54362130.4cac8","name":"NPR  News","url":"https://feeds.npr.org/1001/rss.xml","interval":"2","x":140,"y":540,"wires":[["9ee47d96.d776a"]]},{"id":"69361000.919b9","type":"debug","z":"54362130.4cac8","name":"msg","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":1030,"y":240,"wires":[]},{"id":"9ee47d96.d776a","type":"switch","z":"54362130.4cac8","name":"","property":"article.description","propertyType":"msg","rules":[{"t":"regex","v":"medical","vt":"str","case":true},{"t":"regex","v":"coronavirus","vt":"str","case":true},{"t":"else"}],"checkall":"true","repair":false,"outputs":3,"x":310,"y":580,"wires":[["92a550a9.da2ca"],["92a550a9.da2ca"],[]]},{"id":"cbdae698.387738","type":"sqlite","z":"fd059313.7a178","mydb":"94050917.c7e168","sqlquery":"msg.topic","sql":"","name":"db","x":370,"y":260,"wires":[["40e99eeb.13ac6"]]},{"id":"92a550a9.da2ca","type":"change","z":"54362130.4cac8","name":"","rules":[{"t":"set","p":"payload","pt":"msg","to":"article.description","tot":"str"},{"t":"set","p":"topic","pt":"msg","to":"","tot":"msg"},{"t":"set","p":"from","pt":"msg","to":"\"RSS Alert\"<rss-alert@norepl.com>","tot":"str"}],"action":"","property":"","from":"","to":"","reg":false,"x":510,"y":580,"wires":[[]]},{"id":"916346c3.a87c98","type":"inject","z":"fd059313.7a178","name":"Create feed","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"CREATE TABLE feed (name, url);","payload":"","payloadType":"date","x":170,"y":140,"wires":[["cbdae698.387738"]]},{"id":"f4adf31b.f1592","type":"inject","z":"fd059313.7a178","name":"Create keyword","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"CREATE TABLE keyword(expression)","payload":"","payloadType":"date","x":180,"y":180,"wires":[["cbdae698.387738"]]},{"id":"3103d08d.7fed6","type":"inject","z":"fd059313.7a178","name":"Create match","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"CREATE TABLE match (link, title, description, sent, UNIQUE(link))","payload":"","payloadType":"date","x":170,"y":220,"wires":[["cbdae698.387738"]]},{"id":"a5e76de5.f836c","type":"inject","z":"fd059313.7a178","name":"Drop feed","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"DROP TABLE feed ","payload":"","payloadType":"date","x":160,"y":300,"wires":[["cbdae698.387738"]]},{"id":"1d250d00.863f83","type":"inject","z":"fd059313.7a178","name":"Drop keyword","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"DROP TABLE keyword","payload":"","payloadType":"date","x":170,"y":340,"wires":[["cbdae698.387738"]]},{"id":"590ee55.8ec061c","type":"inject","z":"fd059313.7a178","name":"Drop match","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"DROP TABLE match","payload":"","payloadType":"date","x":170,"y":380,"wires":[["cbdae698.387738"]]},{"id":"dbcae16f.5b791","type":"comment","z":"fd059313.7a178","name":"Drop tables","info":"","x":110,"y":260,"wires":[]},{"id":"d1e02e48.d8307","type":"comment","z":"fd059313.7a178","name":"Create tables","info":"","x":110,"y":100,"wires":[]},{"id":"5d87c0d4.c035c","type":"sqlite","z":"93cb51e3.ea973","mydb":"94050917.c7e168","sqlquery":"fixed","sql":"SELECT rowid, * from feed","name":"read feed","x":400,"y":140,"wires":[["ff5438b2.770a98"]]},{"id":"28df8ba6.74a394","type":"debug","z":"93cb51e3.ea973","name":"error msg","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":940,"y":580,"wires":[]},{"id":"40e99eeb.13ac6","type":"debug","z":"fd059313.7a178","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":560,"y":280,"wires":[]},{"id":"17cfe2c1.8a8d1d","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/feed","method":"post","upload":false,"swaggerDoc":"","x":110,"y":200,"wires":[["3216c82c.2359a8"]]},{"id":"3216c82c.2359a8","type":"template","z":"93cb51e3.ea973","name":"INSERT feed","field":"topic","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"INSERT INTO feed Values ('{{payload.name}}', '{{{payload.url}}}')","output":"str","x":390,"y":200,"wires":[["39148765.8e9fc8"]]},{"id":"39148765.8e9fc8","type":"sqlite","z":"93cb51e3.ea973","mydb":"94050917.c7e168","sqlquery":"msg.topic","sql":"","name":"db  ","x":570,"y":200,"wires":[["5d87c0d4.c035c"]]},{"id":"47cbd9f3.c709d8","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/feed/delete/:rowid","method":"get","upload":false,"swaggerDoc":"","x":150,"y":260,"wires":[["90948786.a1fa38"]]},{"id":"90948786.a1fa38","type":"template","z":"93cb51e3.ea973","name":"DELETE feed","field":"topic","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"DELETE from feed WHERE rowid = {{req.params.rowid}}","output":"str","x":400,"y":260,"wires":[["39148765.8e9fc8"]]},{"id":"fcf102b8.a417d","type":"comment","z":"93cb51e3.ea973","name":"/monitor/feed","info":"","x":110,"y":80,"wires":[]},{"id":"78ce8063.0c966","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/keyword","method":"get","upload":false,"swaggerDoc":"","x":120,"y":420,"wires":[["ec40f9e.984e208"]]},{"id":"90a2e7ea.069168","type":"template","z":"93cb51e3.ea973","name":"","field":"payload","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"<!DOCTYPE html>\n<html>\n    <head>\n        <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/sketchy/bootstrap.min.css\" integrity=\"sha384-RxqHG2ilm4r6aFRpGmBbGTjsqwfqHOKy1ArsMhHusnRO47jcGqpIQqlQK/kmGy9R\" crossorigin=\"anonymous\">\n    </head>\n<body>\n<div class=\"container\">\n<h1>Feed</h1>\n<div class=\"row\">\n    <div class=\"col-md-6\">\n        <table class=\"table\">\n          <thead>\n            <tr>\n              <th scope=\"col\">Expression</th>\n              <th scope=\"col\"></th>\n            </tr>\n          </thead>\n          <tbody>\n            {{#payload}}\n            <tr class=\"table-primary\">\n              <td>{{expression}}</td>\n              <td><a href=\"/monitor/keyword/delete/{{rowid}}\" class=\"btn btn-outline-danger\">Delete</a></td>\n            </tr> \n            {{/payload}}\n          </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-6\">\n        <form method=\"post\" action=\"/monitor/keyword\">\n            <label for=\"expression\">Expression</label>\n            <input class=\"form-control\" id=\"expression\" name=\"expression\">\n            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n        </form>\n    </div>\n</div>\n</div>\n</body>\n</html>","output":"str","x":560,"y":420,"wires":[["50b50172.6170d"]]},{"id":"50b50172.6170d","type":"http response","z":"93cb51e3.ea973","name":"","statusCode":"","headers":{},"x":690,"y":420,"wires":[]},{"id":"ec40f9e.984e208","type":"sqlite","z":"93cb51e3.ea973","mydb":"94050917.c7e168","sqlquery":"fixed","sql":"SELECT rowid, * from keyword","name":"READ","x":390,"y":420,"wires":[["90a2e7ea.069168"]]},{"id":"53dc4e1c.07034","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/keyword","method":"post","upload":false,"swaggerDoc":"","x":120,"y":480,"wires":[["9f184784.6138e8"]]},{"id":"9f184784.6138e8","type":"template","z":"93cb51e3.ea973","name":"INSERT  ","field":"topic","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"INSERT INTO keyword Values ('{{payload.expression}}')","output":"str","x":380,"y":480,"wires":[["a79616d6.fd5bf8"]]},{"id":"a79616d6.fd5bf8","type":"sqlite","z":"93cb51e3.ea973","mydb":"94050917.c7e168","sqlquery":"msg.topic","sql":"","name":"db  ","x":570,"y":480,"wires":[["ec40f9e.984e208"]]},{"id":"8c399169.e37f1","type":"http in","z":"93cb51e3.ea973","name":"","url":"/monitor/keyword/delete/:rowid","method":"get","upload":false,"swaggerDoc":"","x":160,"y":540,"wires":[["d5bdd7fc.4ecd88"]]},{"id":"d5bdd7fc.4ecd88","type":"template","z":"93cb51e3.ea973","name":"DELETE","field":"topic","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"DELETE from keyword WHERE rowid = {{req.params.rowid}}","output":"str","x":380,"y":540,"wires":[["a79616d6.fd5bf8"]]},{"id":"a47011fc.44872","type":"comment","z":"93cb51e3.ea973","name":"/monitor/keyword","info":"","x":120,"y":360,"wires":[]},{"id":"b9fd49ba.cfceb8","type":"comment","z":"54362130.4cac8","name":"RSS Reader","info":"","x":180,"y":40,"wires":[]},{"id":"9a051cbe.5def1","type":"inject","z":"54362130.4cac8","name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"","payloadType":"date","x":180,"y":100,"wires":[["29f6bd67.e356d2"]]},{"id":"42d620fc.d35c6","type":"comment","z":"54362130.4cac8","name":"reading keywords","info":"","x":240,"y":160,"wires":[]},{"id":"29f6bd67.e356d2","type":"sqlite","z":"54362130.4cac8","mydb":"94050917.c7e168","sqlquery":"fixed","sql":"SELECT rowid, * from keyword","name":"READ","x":250,"y":200,"wires":[["58b9d07b.a7862"]]},{"id":"58b9d07b.a7862","type":"change","z":"54362130.4cac8","name":"Keyword","rules":[{"t":"set","p":"keyword","pt":"msg","to":"$join(payload.expression, \"|\")","tot":"jsonata"}],"action":"","property":"","from":"","to":"","reg":false,"x":380,"y":200,"wires":[["bfe227b2.905ec8"]]},{"id":"839e2a2f.c805b8","type":"comment","z":"54362130.4cac8","name":"reading feed urls","info":"","x":540,"y":160,"wires":[]},{"id":"bfe227b2.905ec8","type":"sqlite","z":"54362130.4cac8","mydb":"94050917.c7e168","sqlquery":"fixed","sql":"SELECT rowid, * from feed","name":"read feed","x":540,"y":200,"wires":[["5e10a3b8.270e9c"]]},{"id":"5e10a3b8.270e9c","type":"split","z":"54362130.4cac8","name":"","splt":"\\n","spltType":"str","arraySplt":1,"arraySpltType":"len","stream":false,"addname":"","x":689,"y":200,"wires":[["41752c77.34e064"]]},{"id":"535f1ef4.f32cf","type":"http request","z":"54362130.4cac8","name":"","method":"GET","ret":"txt","paytoqs":"ignore","url":"","tls":"","persist":false,"proxy":"","authType":"","x":430,"y":280,"wires":[["7952091b.f8ef68"]]},{"id":"41752c77.34e064","type":"change","z":"54362130.4cac8","name":"read url","rules":[{"t":"move","p":"payload.url","pt":"msg","to":"url","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":260,"y":280,"wires":[["535f1ef4.f32cf"]]},{"id":"113e9133.22cb3f","type":"change","z":"54362130.4cac8","name":"read item","rules":[{"t":"move","p":"payload.rss.channel[0].item","pt":"msg","to":"payload","tot":"msg"}],"action":"","property":"","from":"","to":"","reg":false,"x":260,"y":340,"wires":[["d9acf8a5.d79498"]]},{"id":"d9acf8a5.d79498","type":"split","z":"54362130.4cac8","name":"split articles","splt":"\\n","spltType":"str","arraySplt":1,"arraySpltType":"len","stream":false,"addname":"","x":430,"y":340,"wires":[["a27c8c14.ee438"]]},{"id":"a27c8c14.ee438","type":"switch","z":"54362130.4cac8","name":" match?","property":"payload.description[1]","propertyType":"msg","rules":[{"t":"regex","v":"keyword","vt":"msg","case":true},{"t":"else"}],"checkall":"true","repair":false,"outputs":2,"x":660,"y":340,"wires":[["d2e9687e.d381e8"],[]]},{"id":"d2e9687e.d381e8","type":"template","z":"54362130.4cac8","name":"INSERT  ","field":"topic","fieldType":"msg","format":"handlebars","syntax":"mustache","template":"INSERT OR IGNORE INTO matc Values (\n    '{{payload.link.1}}',\n    '{{payload.title.1}}',\n    '{{payload.description.1}}',\n    0) ","output":"str","x":840,"y":340,"wires":[[]]},{"id":"7952091b.f8ef68","type":"xml","z":"54362130.4cac8","name":"","property":"payload","attr":"","chr":"","x":590,"y":280,"wires":[["69361000.919b9"]]}]
+[
+    {
+        "id": "93cb51e3.ea973",
+        "type": "tab",
+        "label": "web-request",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "54362130.4cac8",
+        "type": "tab",
+        "label": "RSS Reader",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "fd059313.7a178",
+        "type": "tab",
+        "label": "db-admin",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "212f736e.2f486c",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0088cc",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0088cc",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0088cc",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1ab2ff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0088cc",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "d0b422f7.437dd8",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "62f7b60d.c5f978",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "d0b422f7.437dd8",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "94050917.c7e168",
+        "type": "sqlitedb",
+        "db": "memory",
+        "mode": "RWC"
+    },
+    {
+        "id": "9a7bf3e9.632cb",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/feed",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "5d87c0d4.c035c"
+            ]
+        ]
+    },
+    {
+        "id": "ff5438b2.770a98",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n    <head>\n        <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/sketchy/bootstrap.min.css\" integrity=\"sha384-RxqHG2ilm4r6aFRpGmBbGTjsqwfqHOKy1ArsMhHusnRO47jcGqpIQqlQK/kmGy9R\" crossorigin=\"anonymous\">\n    </head>\n<body>\n\n\n<div class=\"container\">\n<h1>Feed</h1>\n<div class=\"row\">\n    <div class=\"col-md-6\">\n        <table class=\"table\">\n          <thead>\n            <tr>\n        \n              <th scope=\"col\">Name</th>\n              <th scope=\"col\">URL</th>\n              <th scope=\"col\"></th>\n            </tr>\n          </thead>\n          <tbody>\n            {{#payload}}\n            <tr class=\"table-primary\">\n              <td>{{name}}</td>\n              <td>{{url}}</td>\n              <td><a href=\"/monitor/feed/delete/{{rowid}}\" class=\"btn btn-outline-danger\">Delete</a></td>\n            </tr> \n            {{/payload}}\n          </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-6\">\n        <form method=\"post\" action=\"/monitor/feed\">\n            <label for=\"name\">Name</label>\n            <input class=\"form-control\" id=\"name\" name=\"name\">\n            <label for=\"url\">URL</label>\n            <input class=\"form-control\" id=\"url\" name=\"url\">  \n            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n        </form>\n    </div>\n</div>\n\n\n\n\n</div>\n</body>\n</html>",
+        "output": "str",
+        "x": 560,
+        "y": 140,
+        "wires": [
+            [
+                "982e6651.11b818"
+            ]
+        ]
+    },
+    {
+        "id": "982e6651.11b818",
+        "type": "http response",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 690,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "52d11d7d.bf0d34",
+        "type": "feedparse",
+        "z": "54362130.4cac8",
+        "name": "NPR  News",
+        "url": "https://feeds.npr.org/1001/rss.xml",
+        "interval": "2",
+        "x": 140,
+        "y": 540,
+        "wires": [
+            [
+                "9ee47d96.d776a"
+            ]
+        ]
+    },
+    {
+        "id": "69361000.919b9",
+        "type": "debug",
+        "z": "54362130.4cac8",
+        "name": "msg",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "9ee47d96.d776a",
+        "type": "switch",
+        "z": "54362130.4cac8",
+        "name": "",
+        "property": "article.description",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "medical",
+                "vt": "str",
+                "case": true
+            },
+            {
+                "t": "regex",
+                "v": "coronavirus",
+                "vt": "str",
+                "case": true
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 310,
+        "y": 580,
+        "wires": [
+            [
+                "92a550a9.da2ca"
+            ],
+            [
+                "92a550a9.da2ca"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "cbdae698.387738",
+        "type": "sqlite",
+        "z": "fd059313.7a178",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "db",
+        "x": 370,
+        "y": 260,
+        "wires": [
+            [
+                "40e99eeb.13ac6"
+            ]
+        ]
+    },
+    {
+        "id": "92a550a9.da2ca",
+        "type": "change",
+        "z": "54362130.4cac8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "article.description",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "from",
+                "pt": "msg",
+                "to": "\"RSS Alert\"<rss-alert@norepl.com>",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "916346c3.a87c98",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Create feed",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE feed (name, url);",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 140,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "f4adf31b.f1592",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Create keyword",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE keyword(expression)",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "3103d08d.7fed6",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Create match",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE match (link, title, description, sent, UNIQUE(link))",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 220,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "a5e76de5.f836c",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Drop feed",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE feed ",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 300,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "1d250d00.863f83",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Drop keyword",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE keyword",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "590ee55.8ec061c",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Drop match",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE match",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 380,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "dbcae16f.5b791",
+        "type": "comment",
+        "z": "fd059313.7a178",
+        "name": "Drop tables",
+        "info": "",
+        "x": 110,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "d1e02e48.d8307",
+        "type": "comment",
+        "z": "fd059313.7a178",
+        "name": "Create tables",
+        "info": "",
+        "x": 110,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "5d87c0d4.c035c",
+        "type": "sqlite",
+        "z": "93cb51e3.ea973",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from feed",
+        "name": "read feed",
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "ff5438b2.770a98"
+            ]
+        ]
+    },
+    {
+        "id": "28df8ba6.74a394",
+        "type": "debug",
+        "z": "93cb51e3.ea973",
+        "name": "error msg",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "40e99eeb.13ac6",
+        "type": "debug",
+        "z": "fd059313.7a178",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "17cfe2c1.8a8d1d",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/feed",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "3216c82c.2359a8"
+            ]
+        ]
+    },
+    {
+        "id": "3216c82c.2359a8",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "INSERT feed",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT INTO feed Values ('{{payload.name}}', '{{{payload.url}}}')",
+        "output": "str",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "39148765.8e9fc8"
+            ]
+        ]
+    },
+    {
+        "id": "39148765.8e9fc8",
+        "type": "sqlite",
+        "z": "93cb51e3.ea973",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "db  ",
+        "x": 570,
+        "y": 200,
+        "wires": [
+            [
+                "5d87c0d4.c035c"
+            ]
+        ]
+    },
+    {
+        "id": "47cbd9f3.c709d8",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/feed/delete/:rowid",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 260,
+        "wires": [
+            [
+                "90948786.a1fa38"
+            ]
+        ]
+    },
+    {
+        "id": "90948786.a1fa38",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "DELETE feed",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "DELETE from feed WHERE rowid = {{req.params.rowid}}",
+        "output": "str",
+        "x": 400,
+        "y": 260,
+        "wires": [
+            [
+                "39148765.8e9fc8"
+            ]
+        ]
+    },
+    {
+        "id": "fcf102b8.a417d",
+        "type": "comment",
+        "z": "93cb51e3.ea973",
+        "name": "/monitor/feed",
+        "info": "",
+        "x": 110,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "78ce8063.0c966",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/keyword",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 420,
+        "wires": [
+            [
+                "ec40f9e.984e208"
+            ]
+        ]
+    },
+    {
+        "id": "90a2e7ea.069168",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n    <head>\n        <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/sketchy/bootstrap.min.css\" integrity=\"sha384-RxqHG2ilm4r6aFRpGmBbGTjsqwfqHOKy1ArsMhHusnRO47jcGqpIQqlQK/kmGy9R\" crossorigin=\"anonymous\">\n    </head>\n<body>\n<div class=\"container\">\n<h1>Feed</h1>\n<div class=\"row\">\n    <div class=\"col-md-6\">\n        <table class=\"table\">\n          <thead>\n            <tr>\n              <th scope=\"col\">Expression</th>\n              <th scope=\"col\"></th>\n            </tr>\n          </thead>\n          <tbody>\n            {{#payload}}\n            <tr class=\"table-primary\">\n              <td>{{expression}}</td>\n              <td><a href=\"/monitor/keyword/delete/{{rowid}}\" class=\"btn btn-outline-danger\">Delete</a></td>\n            </tr> \n            {{/payload}}\n          </tbody>\n        </table>\n    </div>\n    <div class=\"col-md-6\">\n        <form method=\"post\" action=\"/monitor/keyword\">\n            <label for=\"expression\">Expression</label>\n            <input class=\"form-control\" id=\"expression\" name=\"expression\">\n            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n        </form>\n    </div>\n</div>\n</div>\n</body>\n</html>",
+        "output": "str",
+        "x": 560,
+        "y": 420,
+        "wires": [
+            [
+                "50b50172.6170d"
+            ]
+        ]
+    },
+    {
+        "id": "50b50172.6170d",
+        "type": "http response",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 690,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "ec40f9e.984e208",
+        "type": "sqlite",
+        "z": "93cb51e3.ea973",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from keyword",
+        "name": "READ",
+        "x": 390,
+        "y": 420,
+        "wires": [
+            [
+                "90a2e7ea.069168"
+            ]
+        ]
+    },
+    {
+        "id": "53dc4e1c.07034",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/keyword",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 480,
+        "wires": [
+            [
+                "9f184784.6138e8"
+            ]
+        ]
+    },
+    {
+        "id": "9f184784.6138e8",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "INSERT  ",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT INTO keyword Values ('{{payload.expression}}')",
+        "output": "str",
+        "x": 380,
+        "y": 480,
+        "wires": [
+            [
+                "a79616d6.fd5bf8"
+            ]
+        ]
+    },
+    {
+        "id": "a79616d6.fd5bf8",
+        "type": "sqlite",
+        "z": "93cb51e3.ea973",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "db  ",
+        "x": 570,
+        "y": 480,
+        "wires": [
+            [
+                "ec40f9e.984e208"
+            ]
+        ]
+    },
+    {
+        "id": "8c399169.e37f1",
+        "type": "http in",
+        "z": "93cb51e3.ea973",
+        "name": "",
+        "url": "/monitor/keyword/delete/:rowid",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 540,
+        "wires": [
+            [
+                "d5bdd7fc.4ecd88"
+            ]
+        ]
+    },
+    {
+        "id": "d5bdd7fc.4ecd88",
+        "type": "template",
+        "z": "93cb51e3.ea973",
+        "name": "DELETE",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "DELETE from keyword WHERE rowid = {{req.params.rowid}}",
+        "output": "str",
+        "x": 380,
+        "y": 540,
+        "wires": [
+            [
+                "a79616d6.fd5bf8"
+            ]
+        ]
+    },
+    {
+        "id": "a47011fc.44872",
+        "type": "comment",
+        "z": "93cb51e3.ea973",
+        "name": "/monitor/keyword",
+        "info": "",
+        "x": 120,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "b9fd49ba.cfceb8",
+        "type": "comment",
+        "z": "54362130.4cac8",
+        "name": "RSS Reader",
+        "info": "",
+        "x": 180,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "9a051cbe.5def1",
+        "type": "inject",
+        "z": "54362130.4cac8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 100,
+        "wires": [
+            [
+                "29f6bd67.e356d2"
+            ]
+        ]
+    },
+    {
+        "id": "42d620fc.d35c6",
+        "type": "comment",
+        "z": "54362130.4cac8",
+        "name": "reading keywords",
+        "info": "",
+        "x": 240,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "29f6bd67.e356d2",
+        "type": "sqlite",
+        "z": "54362130.4cac8",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from keyword",
+        "name": "READ",
+        "x": 250,
+        "y": 200,
+        "wires": [
+            [
+                "58b9d07b.a7862"
+            ]
+        ]
+    },
+    {
+        "id": "58b9d07b.a7862",
+        "type": "change",
+        "z": "54362130.4cac8",
+        "name": "Keyword",
+        "rules": [
+            {
+                "t": "set",
+                "p": "keyword",
+                "pt": "msg",
+                "to": "$join(payload.expression, \"|\")",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 200,
+        "wires": [
+            [
+                "bfe227b2.905ec8"
+            ]
+        ]
+    },
+    {
+        "id": "839e2a2f.c805b8",
+        "type": "comment",
+        "z": "54362130.4cac8",
+        "name": "reading feed urls",
+        "info": "",
+        "x": 540,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "bfe227b2.905ec8",
+        "type": "sqlite",
+        "z": "54362130.4cac8",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from feed",
+        "name": "read feed",
+        "x": 540,
+        "y": 200,
+        "wires": [
+            [
+                "5e10a3b8.270e9c"
+            ]
+        ]
+    },
+    {
+        "id": "5e10a3b8.270e9c",
+        "type": "split",
+        "z": "54362130.4cac8",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 689,
+        "y": 200,
+        "wires": [
+            [
+                "41752c77.34e064"
+            ]
+        ]
+    },
+    {
+        "id": "535f1ef4.f32cf",
+        "type": "http request",
+        "z": "54362130.4cac8",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 430,
+        "y": 280,
+        "wires": [
+            [
+                "7952091b.f8ef68"
+            ]
+        ]
+    },
+    {
+        "id": "41752c77.34e064",
+        "type": "change",
+        "z": "54362130.4cac8",
+        "name": "read url",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.url",
+                "pt": "msg",
+                "to": "url",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 260,
+        "y": 280,
+        "wires": [
+            [
+                "535f1ef4.f32cf"
+            ]
+        ]
+    },
+    {
+        "id": "113e9133.22cb3f",
+        "type": "change",
+        "z": "54362130.4cac8",
+        "name": "read item",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.rss.channel[0].item",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 260,
+        "y": 340,
+        "wires": [
+            [
+                "d9acf8a5.d79498"
+            ]
+        ]
+    },
+    {
+        "id": "d9acf8a5.d79498",
+        "type": "split",
+        "z": "54362130.4cac8",
+        "name": "split articles",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 430,
+        "y": 340,
+        "wires": [
+            [
+                "a27c8c14.ee438"
+            ]
+        ]
+    },
+    {
+        "id": "a27c8c14.ee438",
+        "type": "switch",
+        "z": "54362130.4cac8",
+        "name": " match?",
+        "property": "payload.description[1]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "keyword",
+                "vt": "msg",
+                "case": true
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 660,
+        "y": 340,
+        "wires": [
+            [
+                "d2e9687e.d381e8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d2e9687e.d381e8",
+        "type": "template",
+        "z": "54362130.4cac8",
+        "name": "INSERT  ",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT OR IGNORE INTO matc Values (\n    '{{payload.link.1}}',\n    '{{payload.title.1}}',\n    '{{payload.description.1}}',\n    0) ",
+        "output": "str",
+        "x": 840,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7952091b.f8ef68",
+        "type": "xml",
+        "z": "54362130.4cac8",
+        "name": "split it",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 590,
+        "y": 280,
+        "wires": [
+            [
+                "69361000.919b9"
+            ]
+        ]
+    }
+]
