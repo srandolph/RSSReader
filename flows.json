@@ -188,21 +188,6 @@
         "wires": []
     },
     {
-        "id": "52d11d7d.bf0d34",
-        "type": "feedparse",
-        "z": "54362130.4cac8",
-        "name": "NPR  News",
-        "url": "https://feeds.npr.org/1001/rss.xml",
-        "interval": "2",
-        "x": 140,
-        "y": 540,
-        "wires": [
-            [
-                "9ee47d96.d776a"
-            ]
-        ]
-    },
-    {
         "id": "69361000.919b9",
         "type": "debug",
         "z": "54362130.4cac8",
@@ -215,48 +200,9 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 830,
-        "y": 260,
+        "x": 870,
+        "y": 460,
         "wires": []
-    },
-    {
-        "id": "9ee47d96.d776a",
-        "type": "switch",
-        "z": "54362130.4cac8",
-        "name": "",
-        "property": "article.description",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "regex",
-                "v": "medical",
-                "vt": "str",
-                "case": true
-            },
-            {
-                "t": "regex",
-                "v": "coronavirus",
-                "vt": "str",
-                "case": true
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 3,
-        "x": 310,
-        "y": 580,
-        "wires": [
-            [
-                "92a550a9.da2ca"
-            ],
-            [
-                "92a550a9.da2ca"
-            ],
-            []
-        ]
     },
     {
         "id": "cbdae698.387738",
@@ -272,45 +218,6 @@
             [
                 "40e99eeb.13ac6"
             ]
-        ]
-    },
-    {
-        "id": "92a550a9.da2ca",
-        "type": "change",
-        "z": "54362130.4cac8",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "article.description",
-                "tot": "str"
-            },
-            {
-                "t": "set",
-                "p": "topic",
-                "pt": "msg",
-                "to": "",
-                "tot": "msg"
-            },
-            {
-                "t": "set",
-                "p": "from",
-                "pt": "msg",
-                "to": "\"RSS Alert\"<rss-alert@norepl.com>",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 510,
-        "y": 580,
-        "wires": [
-            []
         ]
     },
     {
@@ -536,8 +443,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 940,
-        "y": 580,
+        "x": 840,
+        "y": 280,
         "wires": []
     },
     {
@@ -1043,8 +950,7 @@
         "y": 340,
         "wires": [
             [
-                "a27c8c14.ee438",
-                "69361000.919b9"
+                "a27c8c14.ee438"
             ]
         ]
     },
@@ -1053,7 +959,7 @@
         "type": "switch",
         "z": "54362130.4cac8",
         "name": " match?",
-        "property": "payload.description[1]",
+        "property": "payload.description[0]",
         "propertyType": "msg",
         "rules": [
             {
@@ -1072,7 +978,9 @@
         "x": 560,
         "y": 340,
         "wires": [
-            [],
+            [
+                "d2e9687e.d381e8"
+            ],
             []
         ]
     },
@@ -1085,12 +993,14 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "INSERT OR IGNORE INTO matc Values (\n    '{{payload.link.1}}',\n    '{{payload.title.1}}',\n    '{{payload.description.1}}',\n    0) ",
+        "template": "INSERT OR IGNORE INTO match VALUES (\n    '{{{payload.link.0}}}',\n    '{{payload.title.0}}',\n    '{{payload.description.0}}',\n    0) ",
         "output": "str",
-        "x": 700,
-        "y": 340,
+        "x": 260,
+        "y": 400,
         "wires": [
-            []
+            [
+                "92046436.c73108"
+            ]
         ]
     },
     {
@@ -1106,6 +1016,51 @@
         "wires": [
             [
                 "113e9133.22cb3f"
+            ]
+        ]
+    },
+    {
+        "id": "77cb3d6e.5ad3b4",
+        "type": "inject",
+        "z": "fd059313.7a178",
+        "name": "Read match",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * from match",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 500,
+        "wires": [
+            [
+                "cbdae698.387738"
+            ]
+        ]
+    },
+    {
+        "id": "92046436.c73108",
+        "type": "sqlite",
+        "z": "54362130.4cac8",
+        "mydb": "94050917.c7e168",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "db",
+        "x": 405,
+        "y": 400,
+        "wires": [
+            [
+                "69361000.919b9"
             ]
         ]
     }
